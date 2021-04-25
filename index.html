@@ -1,0 +1,316 @@
+<!-- Build a browser form which collects Email, Country, Zip Code, Password and Password Confirmation fields. It should use live inline validation to inform the user whether a field is properly filled in or not. That means highlighting a field red and providing a helpful error message until it has been filled in properly. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form project</title>
+
+    <style>
+        body {
+    font: 1em sans-serif;
+    width: 200px;
+    padding: 0;
+    margin : 0 auto;
+  }
+  
+  p * {
+    display: block;
+  }
+  
+  input[type=email]{
+    -webkit-appearance: none;
+    appearance: none;
+  
+    width: 100%;
+    border: 2px solid #333;
+    margin: 0;
+  
+    font-family: inherit;
+    font-size: 90%;
+  
+    box-sizing: border-box;
+  }
+  
+  /* This is our style for the invalid fields */
+  input:invalid{
+    border-color: #900;
+    background-color: #FDD;
+  }
+  
+  input:focus:invalid {
+    outline: none;
+  }
+
+  input:valid{
+      border-color: green;
+  }
+  
+  /* This is the style of our error messages */
+  .error {
+    width  : 100%;
+    padding: 0;
+  
+    font-size: 80%;
+    color: white;
+    background-color: #900;
+    border-radius: 0 0 5px 5px;
+  
+    box-sizing: border-box;
+  }
+  
+  .error.active {
+    padding: 0.3em;
+  }
+      </style>
+
+</head>
+<body>
+    <form novalidate>
+        <span>Please enter an email address:</span>
+        <input type="email" id="mail" name="mail" required minlength="8">
+        <span class="error" aria-live="polite"></span>
+    </form>
+<br>
+
+    <form novalidate>
+    <span>Country</span>
+    <input type="text" name="country" id="country" required minlength="4">
+    <span class="error1" aria-live="polite"></span>
+
+    </form>
+<br>
+
+  <form novalidate>
+  <span>Zip</span>
+  <br>
+  <input type="text" name="zip" id="zip" required minlength="6" maxlength="6" pattern="^(0|[1-9][0-9]*)$">
+  <span class="error2" aria-live="polite"></span>
+
+  </form>
+
+<br>
+
+  <form novalidate>
+  <span>Password</span>
+  <input type="password" name="password" id="password" required minlength="8" pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$">
+  <span class="error3" aria-live="polite"></span>
+
+  </form>
+
+
+</body>
+</html>
+
+<!-- Validators
+email, check min 8 chars, tooshort, typemismatch, valuemissing
+country - min 4 chars, a-z
+zip - regex - /(^\d{5}$)|(^\d{5}-\d{4}$)/
+Password - min 8 chars, uppercase, lowercase, 1 number
+
+-->
+
+<script>
+
+// Email validation
+const form0 = document.getElementsByTagName('form')[0];
+
+const email = document.getElementById('mail');
+const emailError = document.querySelector('#mail + span.error');
+
+email.addEventListener('input', function(event) {
+    if (email.validity.valid) {
+    // In case there is an error message visible, if the field
+    // is valid, we remove the error message.
+    emailError.textContent = ''; // Reset the content of the message
+    emailError.className = 'error'; // Reset the visual state of the message
+  } else {
+    // If there is still an error, show the correct error
+    showError();
+  }
+});
+
+form0.addEventListener('submit', function (event) {
+  // if the email field is valid, we let the form submit
+
+  if(!email.validity.valid) {
+    // If it isn't, we display an appropriate error message
+    showError();
+    // Then we prevent the form from being sent by canceling the event
+    event.preventDefault();
+  }
+  else {
+      console.log('SUBMITTED')
+  }
+});
+
+  function showError() {
+    if(email.validity.valueMissing) {
+    // If the field is empty
+    // display the following error message.
+    emailError.textContent = 'You need to enter an e-mail address.';
+  } else if(email.validity.typeMismatch) {
+    // If the field doesn't contain an email address
+    // display the following error message.
+    emailError.textContent = 'Entered value needs to be an e-mail address.';
+  } else if(email.validity.tooShort) {
+    // If the data is too short
+    // display the following error message.
+    emailError.textContent = `Email should be at least ${ email.minLength } characters; you entered ${ email.value.length }.`;
+  }
+
+  // Set the styling appropriately
+  emailError.className = 'error active';
+
+}
+
+// Country validation
+const form1 = document.getElementsByTagName('form')[1];
+
+const country = document.getElementById('country');
+const countryError = document.querySelector('#country + span.error1');
+
+console.log(form1)
+
+form1.addEventListener('submit', function (event) {
+  // if the email field is valid, we let the form submit
+
+  if(!country.validity.valid) {
+    // If it isn't, we display an appropriate error message
+    showError1();
+    // Then we prevent the form from being sent by canceling the event
+    event.preventDefault();
+  }
+  else {
+      console.log('SUBMITTED')
+  }
+});
+
+function showError1() {
+    if(country.validity.valueMissing) {
+    // If the field is empty
+    // display the following error message.
+    countryError.textContent = 'You need to enter a country.';
+  } else if(country.validity.tooShort) {
+    // If the data is too short
+    // display the following error message.
+    countryError.textContent = `Country should be at least ${ country.minLength } characters; you entered ${ country.value.length }.`;
+  }
+
+  // Set the styling appropriately
+  countryError.className = 'error active';
+
+}
+
+
+// Zip
+// zip - regex - /(^\d{5}$)|(^\d{5}-\d{4}$)/
+
+const form2 = document.getElementsByTagName('form')[2];
+
+const zip = document.getElementById('zip');
+const zipError = document.querySelector('#zip + span.error2');
+
+zip.addEventListener('input', function(event) {
+    if (zip.validity.valid) {
+    // In case there is an error message visible, if the field
+    // is valid, we remove the error message.
+    zipError.textContent = ''; // Reset the content of the message
+    zipError.className = 'error'; // Reset the visual state of the message
+  } else {
+    // If there is still an error, show the correct error
+    showError2();
+  }
+});
+
+form2.addEventListener('submit', function (event) {
+  // if the email field is valid, we let the form submit
+
+  if(!zip.validity.valid) {
+    // If it isn't, we display an appropriate error message
+    showError2();
+    // Then we prevent the form from being sent by canceling the event
+    event.preventDefault();
+  }
+  else {
+      console.log('SUBMITTEDZip')
+  }
+});
+
+  function showError2() {
+    if(zip.validity.valueMissing) {
+    // If the field is empty
+    // display the following error message.
+    zipError.textContent = 'You need to enter a zipcode, numbers only.';
+  } else if(zip.validity.typeMismatch) {
+    // If the field doesn't contain an email address
+    // display the following error message.
+    zipError.textContent = 'Entered value needs to numbers.';
+  } else if(zip.validity.tooShort) {
+    // If the data is too short
+    // display the following error message.
+    zipError.textContent = `Zip should be at least ${ zip.minLength } characters; you entered ${ zip.value.length }.`;
+  } 
+  // Set the styling appropriately
+  zipError.className = 'error active';
+
+}
+
+
+// Password
+
+const form3 = document.getElementsByTagName('form')[3];
+
+const password = document.getElementById('password');
+const passwordError = document.querySelector('#password + span.error3');
+
+password.addEventListener('input', function(event) {
+    if (password.validity.valid) {
+    // In case there is an error message visible, if the field
+    // is valid, we remove the error message.
+    passwordError.textContent = ''; // Reset the content of the message
+    passwordError.className = 'error'; // Reset the visual state of the message
+  } else {
+    // If there is still an error, show the correct error
+    showError3();
+  }
+});
+
+form3.addEventListener('submit', function (event) {
+  // if the email field is valid, we let the form submit
+
+  if(!password.validity.valid) {
+    // If it isn't, we display an appropriate error message
+    showError3();
+    // Then we prevent the form from being sent by canceling the event
+    event.preventDefault();
+  }
+  else {
+      console.log('SUBMITTEDpass')
+  }
+});
+
+  function showError3() {
+    if(password.validity.valueMissing) {
+    // If the field is empty
+    // display the following error message.
+    passwordError.textContent = 'You need to enter a password, 8 chars, at least 1 letter, at least 1 number.';
+  } else if(password.validity.typeMismatch) {
+    // If the field doesn't contain an email address
+    // display the following error message.
+    passwordError.textContent = 'Entered value needs to numbers.';
+  } else if(password.validity.tooShort) {
+    // If the data is too short
+    // display the following error message.
+    passwordError.textContent = `Pass should be at least ${ password.minLength } characters; you entered ${ password.value.length }.`;
+  } else if(password.value.length > 8) {
+    passwordError.textContent = `Minimum eight characters, at least one letter and one number`
+  }
+  // Set the styling appropriately
+  passwordError.className = 'error active';
+
+}
+
+
+
+</script>
